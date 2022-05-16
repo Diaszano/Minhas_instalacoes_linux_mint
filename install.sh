@@ -14,6 +14,7 @@ pacote=$(dpkg --get-selections | grep "$nome" )
 if [ -n "$pacote" ] ;
 then echo
     echo "$nome ja esta instalado!"
+    sleep 5
 else echo
     echo "Instalando $nome"
     sudo apt-get install $nome -y
@@ -31,6 +32,7 @@ pacote=$(dpkg --get-selections | grep "$nome" )
 if [ -n "$pacote" ] ;
 then echo
     echo "$nome ja esta instalado!"
+    sleep 5
 else echo
     echo "Instalando $nome"
     sudo apt-get install $nome -y
@@ -47,6 +49,7 @@ pacote=$(dpkg --get-selections | grep "$nome" )
 if [ -n "$pacote" ] ;
 then echo
     echo "$nome ja esta instalado!"
+    sleep 5
 else echo
     echo "Instalando $nome"
     curl https://rclone.org/install.sh | sudo bash
