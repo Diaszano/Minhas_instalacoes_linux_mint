@@ -7,6 +7,8 @@ sudo apt-get dist-upgrade -y
 # ---------------------------------------------------
 clear
 # ---------------------------------------------------
+# PRELOAD - https://pt.wikipedia.org/wiki/Preload
+# ---------------------------------------------------
 nome=preload
 pacote=$(dpkg --get-selections | grep "$nome" ) 
 if [ -n "$pacote" ] ;
@@ -22,6 +24,8 @@ fi
 # ---------------------------------------------------
 clear
 # ---------------------------------------------------
+# GIT - https://git-scm.com/
+# ---------------------------------------------------
 nome=git
 pacote=$(dpkg --get-selections | grep "$nome" ) 
 if [ -n "$pacote" ] ;
@@ -35,6 +39,8 @@ else echo
 fi
 # ---------------------------------------------------
 clear
+# ---------------------------------------------------
+# Rclone - https://rclone.org/
 # ---------------------------------------------------
 nome=rclone
 pacote=$(dpkg --get-selections | grep "$nome" ) 
