@@ -34,7 +34,8 @@ then echo
     sleep 5
 else echo
     echo "Instalando $nome"
-    sudo apt-get install $nome -y
+    curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+    sudo apt-get install -y $nome
     echo "Instalacao do $nome concluida"
     sleep 5
 fi
