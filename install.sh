@@ -21,6 +21,7 @@ else echo
     sudo apt upgrade -y
     wget "https://discord.com/api/download?platform=linux&format=deb" -O discord.deb
     sudo apt install ./discord.deb -y
+    sudo rm discord.deb
     echo "Instalacao do $nome concluida"
     sleep 5
 fi
@@ -269,6 +270,26 @@ fi
 # ---------------------------------------------------
 clear
 # ---------------------------------------------------
+# Insomnia - https://docs.insomnia.rest/
+# ---------------------------------------------------
+nome=insomnia
+pacote=$(dpkg --get-selections | grep "$nome" ) 
+if [ -n "$pacote" ] ;
+then echo
+    echo "$nome ja esta instalado!"
+    sleep 5
+else echo
+    echo "Instalando $nome"
+    sudo apt update && sudo apt upgrade -y
+    echo "deb [trusted=yes arch=amd64] https://download.konghq.com/insomnia-ubuntu/ default all" | sudo tee -a /etc/apt/sources.list.d/insomnia.list
+    sudo apt update && sudo apt upgrade -y
+    sudo apt install $nome -y
+    echo "Instalacao do $nome concluida"
+    sleep 5
+fi
+# ---------------------------------------------------
+clear
+# ---------------------------------------------------
 # RCLONE - https://rclone.org/
 # ---------------------------------------------------
 nome=rclone
@@ -282,6 +303,32 @@ else echo
     curl https://rclone.org/install.sh | sudo bash
     echo "Instalacao do $nome concluida"
     sleep 5
+fi
+# ---------------------------------------------------
+clear
+# ---------------------------------------------------
+# Docker - https://www.docker.com/
+# ---------------------------------------------------
+nome=docker
+pacote=$(dpkg --get-selections | grep "$nome" ) 
+if [ -n "$pacote" ] ;
+then echo
+    echo "$nome ja esta instalado!"
+    sleep 5
+else echo
+    echo "Instalando $nome"
+    sudo apt update -y
+    sudo apt install apt-transport-https ca-certificates curl software-properties-common -y
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+    sudo apt update -y
+    apt-cache policy docker-ce -y
+    sudo apt install docker-ce -y
+    sudo usermod -aG docker ${USER}
+    sudo - ${USER}
+    sudo usermod -aG docker username
+    echo "Instalacao do $nome concluida"
+    sleep 10
 fi
 # ---------------------------------------------------
 clear
