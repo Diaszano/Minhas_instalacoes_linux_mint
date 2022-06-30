@@ -106,6 +106,46 @@ fi
 # ---------------------------------------------------
 clear
 # ---------------------------------------------------
+# PYTHON 3.9 - https://www.python.org/
+# ---------------------------------------------------
+nome=python3.9
+pacote=$(dpkg --get-selections | grep "$nome" ) 
+if [ -n "$pacote" ] ;
+then echo
+    echo "$nome ja esta instalado!"
+    sleep 5
+else echo
+    echo "Instalando $nome"
+    sudo apt update && sudo apt upgrade -y
+    sudo apt install software-properties-common -y
+    sudo add-apt-repository ppa:deadsnakes/ppa
+    sudo apt install python3.9 -y
+    echo "Instalacao do $nome concluida"
+    sleep 5
+fi
+# ---------------------------------------------------
+clear
+# ---------------------------------------------------
+# PYTHON 3.10 - https://www.python.org/
+# ---------------------------------------------------
+nome=python3.10
+pacote=$(dpkg --get-selections | grep "$nome" ) 
+if [ -n "$pacote" ] ;
+then echo
+    echo "$nome ja esta instalado!"
+    sleep 5
+else echo
+    echo "Instalando $nome"
+    sudo apt update && sudo apt upgrade -y
+    sudo apt install software-properties-common -y
+    sudo add-apt-repository ppa:deadsnakes/ppa
+    sudo apt install python3.10 -y
+    echo "Instalacao do $nome concluida"
+    sleep 5
+fi
+# ---------------------------------------------------
+clear
+# ---------------------------------------------------
 # PIP - https://pypi.org/project/pip/
 # ---------------------------------------------------
 nome=pip
@@ -116,7 +156,26 @@ then echo
     sleep 5
 else echo
     echo "Instalando $nome"
+    sudo apt update && sudo apt upgrade -y
     sudo apt install python3-pip -y
+    echo "Instalacao do $nome concluida"
+    sleep 5
+fi
+# ---------------------------------------------------
+clear
+# ---------------------------------------------------
+# PIPENV - https://pypi.org/project/pipenv/
+# ---------------------------------------------------
+nome=pipenv
+pacote=$(dpkg --get-selections | grep "$nome" ) 
+if [ -n "$pacote" ] ;
+then echo
+    echo "$nome ja esta instalado!"
+    sleep 5
+else echo
+    echo "Instalando $nome"
+    sudo apt update && sudo apt upgrade -y
+    sudo apt install $nome -y
     echo "Instalacao do $nome concluida"
     sleep 5
 fi
