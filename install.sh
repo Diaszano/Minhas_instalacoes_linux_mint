@@ -1,346 +1,186 @@
 #!/bin/bash
-clear
-# ---------------------------------------------------
-sudo apt-get update -y
-sudo apt-get upgrade -y 
-sudo apt-get dist-upgrade -y 
-# ---------------------------------------------------
-clear
-# ---------------------------------------------------
-# Discord - https://discord.com/
-# ---------------------------------------------------
-nome=discord
-pacote=$(dpkg --get-selections | grep "$nome" ) 
-if [ -n "$pacote" ] ;
-then echo
-    echo "$nome ja esta instalado!"
-    sleep 5
-else echo
-    echo "Instalando $nome"
+# ------------------------------------------------------------------------- #
+#                                                                           #
+# Autor:        Lucas Dias                                                  #
+# CO-Autor:     Dionatan Simioni                                            #
+# Referência:   https://github.com/Diolinux/pop-os-postinstall              #
+#                                                                           #
+# ------------------------------------------------------------------------- #
+# ----------------------------- VARIÁVEIS --------------------------------- #
+# DIRETÓRIOS E ARQUIVOS
+DIRETORIO_DOWNLOADS="$HOME/Downloads/programas"
+# CORES
+VERMELHO='\e[1;91m'
+VERDE='\e[1;92m'
+SEM_COR='\e[0m'
+# DEB SOFTWARES
+PROGRAMAS_DEB=(
+    virtualbox
+    gparted
+    timeshift
+    solaar
+    vlc
+    code
+    git
+    wget
+    ubuntu-restricted-extras
+    software-properties-common
+    apt-transport-https
+    ca-certificates
+    preload
+    pipenv
+    curl
+    python3.9
+    python3.10
+    nodejs
+    npm
+    tmux
+    insomnia
+)
+PROGRAMAS_FLATPAK=(
+    com.obsproject.Studio
+    org.gimp.GIMP
+    com.spotify.Client
+    org.telegram.desktop
+    org.freedesktop.Piper
+    org.gnome.Boxes
+    org.qbittorrent.qBittorrent
+    org.flameshot.Flameshot
+)
+# LINKS
+URL_DISCORD="https://discord.com/api/download?platform=linux&format=deb"
+URL_DBEAVER="https://dbeaver.io/files/dbeaver-ce_latest_amd64.deb"
+URL_CHROME="https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
+# ------------------------------ FUNÇÕES ---------------------------------- #
+system_update(){
     sudo apt update -y
-    sudo apt upgrade -y
-    wget "https://discord.com/api/download?platform=linux&format=deb" -O discord.deb
-    sudo apt install ./discord.deb -y
-    sudo rm discord.deb
-    echo "Instalacao do $nome concluida"
-    sleep 5
-fi
-# ---------------------------------------------------
-clear
-# ---------------------------------------------------
-# Spotify - https://www.spotify.com/br/
-# ---------------------------------------------------
-nome=spotify
-pacote=$(dpkg --get-selections | grep "$nome" ) 
-if [ -n "$pacote" ] ;
-then echo
-    echo "$nome ja esta instalado!"
-    sleep 5
-else echo
-    echo "Instalando $nome"
-    curl -sS https://download.spotify.com/debian/pubkey_5E3C45D7B312C643.gpg | sudo apt-key add - 
-    echo "deb http://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list
-    sudo apt-get update -y 
-    sudo apt-get install $nome-client -y
-    echo "Instalacao do $nome concluida"
-    sleep 5
-fi
-# ---------------------------------------------------
-clear
-# ---------------------------------------------------
-# Google Chrome - https://www.google.com/intl/pt-BR/chrome/
-# ---------------------------------------------------
-nome=google-chrome
-pacote=$(dpkg --get-selections | grep "$nome" ) 
-if [ -n "$pacote" ] ;
-then echo
-    echo "$nome ja esta instalado!"
-    sleep 5
-else echo
-    echo "Instalando $nome"
+}
+
+system_upgrade(){
+    system_update
+    sudo apt dist-upgrade -y
+}
+
+system_clean(){
+    system_upgrade -y
+    flatpak update -y
+    sudo apt autoclean -y
+    sudo apt autoremove -y
+}
+
+verificar_internet(){
+    if ! ping -c 1 8.8.8.8 -q &> /dev/null; then
+        echo -e "${VERMELHO}[ERROR] - Seu computador"\
+                "não tem conexão com a Internet."\
+                "Verifique a rede.${SEM_COR}"
+        exit 1
+    else
+        echo -e "${VERDE}[INFO] - Conexão com a Internet"\
+                "funcionando normalmente.${SEM_COR}"
+    fi
+}
+
+install_pre-requisitos(){
+    system_upgrade
+    mkdir "$DIRETORIO_DOWNLOADS"
+    # Discord
+    wget -c "$URL_DISCORD" -O "discord.deb" 
+    # DBeaver
+    wget -c "$URL_DBEAVER" -O "dbeaver.deb" 
+    # Google Chrome
     wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
     sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
-    sudo apt-get update -y
-    sudo apt install $nome-stable -y
-    echo "Instalacao do $nome concluida"
-    sleep 5
-fi
-# ---------------------------------------------------
-clear
-# ---------------------------------------------------
-# DBeaver - https://dbeaver.io/
-# ---------------------------------------------------
-nome=dbeaver
-pacote=$(dpkg --get-selections | grep "$nome" ) 
-if [ -n "$pacote" ] ;
-then echo
-    echo "$nome ja esta instalado!"
-    sleep 5
-else echo
-    echo "Instalando $nome"
-    wget https://dbeaver.io/files/dbeaver-ce_latest_amd64.deb
-    sudo dpkg -i dbeaver-ce_latest_amd64.deb
-    echo "Instalacao do $nome concluida"
-    sleep 5
-fi
-# ---------------------------------------------------
-clear
-# ---------------------------------------------------
-# Visual Studio Code - https://code.visualstudio.com/
-# ---------------------------------------------------
-nome=code
-pacote=$(dpkg --get-selections | grep "$nome" ) 
-if [ -n "$pacote" ] ;
-then echo
-    echo "$nome ja esta instalado!"
-    sleep 5
-else echo
-    echo "Instalando $nome"
-    sudo apt update
-    sudo apt install software-properties-common apt-transport-https wget
+    system_update
+    # Visual Studio Code
     wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | sudo apt-key add -
     sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
-    sudo apt-get install $nome -y
-    echo "Instalacao do $nome concluida"
-    sleep 5
-fi
-# ---------------------------------------------------
-clear
-# ---------------------------------------------------
-# PYTHON 3.9 - https://www.python.org/
-# ---------------------------------------------------
-nome=python3.9
-pacote=$(dpkg --get-selections | grep "$nome" ) 
-if [ -n "$pacote" ] ;
-then echo
-    echo "$nome ja esta instalado!"
-    sleep 5
-else echo
-    echo "Instalando $nome"
-    sudo apt update && sudo apt upgrade -y
+    system_update
+    # PYTHON
     sudo apt install software-properties-common -y
     sudo add-apt-repository ppa:deadsnakes/ppa
-    sudo apt install python3.9 -y
-    echo "Instalacao do $nome concluida"
-    sleep 5
-fi
-# ---------------------------------------------------
-clear
-# ---------------------------------------------------
-# PYTHON 3.10 - https://www.python.org/
-# ---------------------------------------------------
-nome=python3.10
-pacote=$(dpkg --get-selections | grep "$nome" ) 
-if [ -n "$pacote" ] ;
-then echo
-    echo "$nome ja esta instalado!"
-    sleep 5
-else echo
-    echo "Instalando $nome"
-    sudo apt update && sudo apt upgrade -y
-    sudo apt install software-properties-common -y
-    sudo add-apt-repository ppa:deadsnakes/ppa
-    sudo apt install python3.10 -y
-    echo "Instalacao do $nome concluida"
-    sleep 5
-fi
-# ---------------------------------------------------
-clear
-# ---------------------------------------------------
-# PIP - https://pypi.org/project/pip/
-# ---------------------------------------------------
-nome=pip
-pacote=$(dpkg --get-selections | grep "$nome" ) 
-if [ -n "$pacote" ] ;
-then echo
-    echo "$nome ja esta instalado!"
-    sleep 5
-else echo
-    echo "Instalando $nome"
-    sudo apt update && sudo apt upgrade -y
-    sudo apt install python3-pip -y
-    echo "Instalacao do $nome concluida"
-    sleep 5
-fi
-# ---------------------------------------------------
-clear
-# ---------------------------------------------------
-# PIPENV - https://pypi.org/project/pipenv/
-# ---------------------------------------------------
-nome=pipenv
-pacote=$(dpkg --get-selections | grep "$nome" ) 
-if [ -n "$pacote" ] ;
-then echo
-    echo "$nome ja esta instalado!"
-    sleep 5
-else echo
-    echo "Instalando $nome"
-    sudo apt update && sudo apt upgrade -y
-    sudo apt install $nome -y
-    echo "Instalacao do $nome concluida"
-    sleep 5
-fi
-# ---------------------------------------------------
-clear
-# ---------------------------------------------------
-# NODE JS - https://nodejs.org/en/
-# ---------------------------------------------------
-nome=nodejs
-pacote=$(dpkg --get-selections | grep "$nome" ) 
-if [ -n "$pacote" ] ;
-then echo
-    echo "$nome ja esta instalado!"
-    sleep 5
-else echo
-    echo "Instalando $nome"
+    system_update
+    # NODE JS 
     curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-    sudo apt-get install -y $nome
-    echo "Instalacao do $nome concluida"
-    sleep 5
-fi
-# ---------------------------------------------------
-clear
-# ---------------------------------------------------
-# NPM - https://www.npmjs.com/
-# ---------------------------------------------------
-nome=npm
-pacote=$(dpkg --get-selections | grep "$nome" ) 
-if [ -n "$pacote" ] ;
-then echo
-    echo "$nome ja esta instalado!"
-    sleep 5
-else echo
-    echo "Instalando $nome"
-    sudo apt-get install $nome -y
-    echo "Instalacao do $nome concluida"
-    sleep 5
-fi
-# ---------------------------------------------------
-clear
-# ---------------------------------------------------
-# TMUX - https://github.com/tmux/tmux/wiki
-# ---------------------------------------------------
-nome=tmux
-pacote=$(dpkg --get-selections | grep "$nome" ) 
-if [ -n "$pacote" ] ;
-then echo
-    echo "$nome ja esta instalado!"
-    sleep 5
-else echo
-    echo "Instalando $nome"
-    sudo apt-get install $nome -y
-    echo "Instalacao do $nome concluida"
-    sleep 5
-fi
-# ---------------------------------------------------
-clear
-# ---------------------------------------------------
-# PRELOAD - https://pt.wikipedia.org/wiki/Preload
-# ---------------------------------------------------
-nome=preload
-pacote=$(dpkg --get-selections | grep "$nome" ) 
-if [ -n "$pacote" ] ;
-then echo
-    echo "$nome ja esta instalado!"
-    sleep 5
-else echo
-    echo "Instalando $nome"
-    sudo apt-get install $nome -y
-    sudo service preload restart
-    echo "Instalacao do $nome concluida"
-    sleep 5
-fi
-# ---------------------------------------------------
-clear
-# ---------------------------------------------------
-# GIT - https://git-scm.com/
-# ---------------------------------------------------
-nome=git
-pacote=$(dpkg --get-selections | grep "$nome" ) 
-if [ -n "$pacote" ] ;
-then echo
-    echo "$nome ja esta instalado!"
-    sleep 5
-else echo
-    echo "Instalando $nome"
-    sudo apt-get install $nome -y
-    echo "Instalacao do $nome concluida"
-    sleep 5
-fi
-# ---------------------------------------------------
-clear
-# ---------------------------------------------------
-# Insomnia - https://docs.insomnia.rest/
-# ---------------------------------------------------
-nome=insomnia
-pacote=$(dpkg --get-selections | grep "$nome" ) 
-if [ -n "$pacote" ] ;
-then echo
-    echo "$nome ja esta instalado!"
-    sleep 5
-else echo
-    echo "Instalando $nome"
-    sudo apt update && sudo apt upgrade -y
+    system_update
+    # Insomnia 
     echo "deb [trusted=yes arch=amd64] https://download.konghq.com/insomnia-ubuntu/ default all" | sudo tee -a /etc/apt/sources.list.d/insomnia.list
-    sudo apt update && sudo apt upgrade -y
-    sudo apt install $nome -y
-    echo "Instalacao do $nome concluida"
-    sleep 5
-fi
-# ---------------------------------------------------
-clear
-# ---------------------------------------------------
-# RCLONE - https://rclone.org/
-# ---------------------------------------------------
-nome=rclone
-pacote=$(dpkg --get-selections | grep "$nome" ) 
-if [ -n "$pacote" ] ;
-then echo
-    echo "$nome ja esta instalado!"
-    sleep 5
-else echo
-    echo "Instalando $nome"
-    curl https://rclone.org/install.sh | sudo bash
-    echo "Instalacao do $nome concluida"
-    sleep 5
-fi
-# ---------------------------------------------------
-clear
-# ---------------------------------------------------
-# Docker - https://www.docker.com/
-# ---------------------------------------------------
-nome=docker
-pacote=$(dpkg --get-selections | grep "$nome" ) 
-if [ -n "$pacote" ] ;
-then echo
-    echo "$nome ja esta instalado!"
-    sleep 5
-else echo
-    echo "Instalando $nome"
-    sudo apt update -y
-    sudo apt install apt-transport-https ca-certificates curl software-properties-common -y
+    system_update
+    # Docker
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
     sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
-    sudo apt update -y
+    system_update
     apt-cache policy docker-ce -y
-    sudo apt install docker-ce -y
+    system_update
+}
+
+pos-install(){
+    # Docker
     sudo usermod -aG docker ${USER}
     sudo - ${USER}
     sudo usermod -aG docker username
-    echo "Instalacao do $nome concluida"
-    sleep 10
-fi
+    # PRELOAD
+    sudo service preload restart
+    # 
+    system_clean
+}
+
+install_apps(){
+    verificar_internet
+    install_pre-requisitos
+    # Instalando pacotes .deb baixados na sessão anterior ##
+    echo -e "${VERDE}[INFO] - Instalando pacotes .deb baixados${SEM_COR}"
+    sudo dpkg -i *.deb
+
+    # Instalar programas no apt
+    echo -e "${VERDE}[INFO] - Instalando pacotes apt do repositório${SEM_COR}"
+
+    for nome_do_programa in ${PROGRAMAS_DEB[@]}; do
+        if ! dpkg -l | grep -q $nome_do_programa; then
+            sudo apt install "$nome_do_programa" -y
+        else
+            echo "[INSTALADO] - $nome_do_programa"
+        fi
+    done
+
+    # Instalar programas no Flatpak
+    echo -e "${VERDE}[INFO] - Instalando pacotes Flatpak${SEM_COR}"
+
+    for nome_do_programa in ${PROGRAMAS_FLATPAK[@]}; do
+        flatpak install "$nome_do_programa" -y
+    done
+
+    # PIP
+    nome=pip
+    pacote=$(dpkg --get-selections | grep "$nome" ) 
+    if [ -n "$pacote" ] ;
+    then echo
+        echo "$nome ja esta instalado!"
+        sleep 5
+    else echo
+        echo "Instalando $nome"
+        sudo apt install python3-pip -y
+        echo "Instalacao do $nome concluida"
+        sleep 5
+    fi
+    # Google Chrome
+    nome=google-chrome
+    pacote=$(dpkg --get-selections | grep "$nome" ) 
+    if [ -n "$pacote" ] ;
+    then echo
+        echo "$nome ja esta instalado!"
+        sleep 5
+    else echo
+        echo "Instalando $nome"
+        sudo apt install $nome-stable -y
+        echo "Instalacao do $nome concluida"
+        sleep 5
+    fi
+    # Install Rclone 
+    curl https://rclone.org/install.sh | sudo bash
+    # 
+    pos-install
+}
 # ---------------------------------------------------
-clear
-# ---------------------------------------------------
-sudo apt-get update -y
-sudo apt-get upgrade -y 
-sudo apt-get dist-upgrade -y 
-# ---------------------------------------------------
-clear
-# ---------------------------------------------------
-sudo apt autoremove -y
-# ---------------------------------------------------
-clear
-# ---------------------------------------------------
-exit
+install_apps
+## finalização
+echo -e "${VERDE}[INFO] - Script finalizado, instalação concluída! :)${SEM_COR}"
