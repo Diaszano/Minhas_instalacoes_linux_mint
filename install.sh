@@ -30,6 +30,7 @@ PROGRAMAS_DEB=(
     preload
     pipenv
     curl
+    python3.8
     python3.9
     python3.10
     nodejs
