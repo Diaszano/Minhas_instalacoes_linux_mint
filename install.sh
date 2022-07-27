@@ -7,8 +7,6 @@
 #                                                                           #
 # ------------------------------------------------------------------------- #
 # ----------------------------- VARIÁVEIS --------------------------------- #
-# DIRETÓRIOS E ARQUIVOS
-DIRETORIO_DOWNLOADS="$HOME/Downloads/programas"
 # CORES
 VERMELHO='\e[1;91m'
 VERDE='\e[1;92m'
@@ -17,12 +15,9 @@ SEM_COR='\e[0m'
 PROGRAMAS_DEB=(
     virtualbox
     gparted
-    timeshift
-    solaar
     vlc
     code
     git
-    wget
     ubuntu-restricted-extras
     software-properties-common
     apt-transport-https
@@ -37,16 +32,16 @@ PROGRAMAS_DEB=(
     npm
     tmux
     insomnia
+    docker-compose
+    qbittorrent
 )
 PROGRAMAS_FLATPAK=(
     com.obsproject.Studio
     org.gimp.GIMP
     com.spotify.Client
     org.telegram.desktop
-    org.freedesktop.Piper
     org.gnome.Boxes
     org.qbittorrent.qBittorrent
-    org.flameshot.Flameshot
 )
 # LINKS
 URL_DISCORD="https://discord.com/api/download?platform=linux&format=deb"
@@ -83,7 +78,7 @@ verificar_internet(){
 
 install_pre-requisitos(){
     system_upgrade
-    mkdir "$DIRETORIO_DOWNLOADS"
+    sudo apt install wget -y
     # Discord
     wget -c "$URL_DISCORD" -O "discord.deb" 
     # DBeaver
@@ -112,6 +107,9 @@ install_pre-requisitos(){
     system_update
     apt-cache policy docker-ce -y
     system_update
+    # Qbittorrent
+    sudo add-apt-repository ppa:qbittorrent-team/qbittorrent-stable -y
+    system_update
 }
 
 pos-install(){
@@ -123,6 +121,8 @@ pos-install(){
     sudo service preload restart
     # 
     system_clean
+    # 
+    rm -r *.deb
 }
 
 install_apps(){
@@ -130,7 +130,7 @@ install_apps(){
     install_pre-requisitos
     # Instalando pacotes .deb baixados na sessão anterior ##
     echo -e "${VERDE}[INFO] - Instalando pacotes .deb baixados${SEM_COR}"
-    sudo dpkg -i *.deb
+    sudo dpkg -i *.deb -y
 
     # Instalar programas no apt
     echo -e "${VERDE}[INFO] - Instalando pacotes apt do repositório${SEM_COR}"
@@ -180,6 +180,7 @@ install_apps(){
     curl https://rclone.org/install.sh | sudo bash
     # 
     pos-install
+    clear
 }
 # ---------------------------------------------------
 install_apps
